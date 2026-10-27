@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F3A5F">
+  <meta name="description" content="Check-in khi vào ca: một phút cho mình trước ca trực. Ba bước: mã số nhân viên, thanh trượt 1–10, chọn một bé Capybara.">
+  <title>Check-in khi vào ca</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Nạp sớm ảnh mức 5 (mặc định của thanh trượt). Đặt cứng URL vì config.js nạp sau;
+       đổi ASSET_BASE trong js/config.js thì nhớ đổi cả href này (hoặc xóa dòng, chỉ mất lợi ích tải sớm). -->
+  <link rel="preload" as="image" href="https://raw.githubusercontent.com/ditruyenhungvuong/nhatkymebau/main/capy-level-05.png">
+</head>
+<body>
+  <a class="skip-link" href="#main">Bỏ qua đến nội dung chính</a>
+
+  <main id="main" class="app-container" tabindex="-1">
+    <noscript><p class="card">Trang này cần bật JavaScript để check-in được nhé.</p></noscript>
+
+    <!-- ===== S01: Card check-in ===== -->
+    <section id="checkin" class="card glass" aria-labelledby="page-title">
+      <span class="badge-tag">🩺 Góc nhỏ trước ca</span>
+      <h1 id="page-title" class="page-title" tabindex="-1">Check-in khi vào ca</h1>
+      <p class="page-lead">Trước khi vào ca, anh/chị dành một phút cho mình nhé. Chỉ ba bước thôi.</p>
+
+      <!-- Bước 1: mã số nhân viên. Tiêu đề bước là label của ô nhập. Không autofocus. -->
+      <div class="form-section">
+        <label class="section-title" id="step1-title" for="employee-id">
+          <span class="step-num">1</span><span class="section-title-text">Mã số nhân viên của anh/chị</span>
+        </label>
+        <p class="section-hint" id="step1-hint">Nhập mã, mình sẽ tìm tên anh/chị.</p>
+        <input id="employee-id" class="field-input" type="text" inputmode="numeric" autocomplete="off"
+               autocapitalize="characters" spellcheck="false" maxlength="8" enterkeyhint="done"
+               placeholder="Ví dụ 1234" aria-describedby="greet">
+        <div id="greet" aria-live="polite">
+          <div class="lookup-state"></div>
+          <div class="greeting"></div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Bước 2: thanh trượt 1–10, capybara đổi mặt theo mức -->
+      <div class="form-section" role="group" aria-labelledby="step2-title">
+        <h2 class="section-title" id="step2-title">
+          <span class="step-num">2</span><span class="section-title-text">Hôm nay anh/chị cảm thấy như thế nào?</span>
+        </h2>
+        <p class="section-hint">Kéo thanh trượt, bé Capybara sẽ đổi mặt theo. Mức nào cũng được.</p>
+        <img id="level-img" class="emotion-capy" alt="Bình thường" data-fallback="😐" decoding="async">
+        <div id="level-label" class="range-label" aria-live="polite">5 · Bình thường</div>
+        <input id="level-range" class="styled-range" type="range" min="1" max="10" step="1" value="5"
+               aria-labelledby="step2-title" aria-valuetext="5 · Bình thường">
+        <div class="range-ends" aria-hidden="true"><span>1 Rất mệt</span><span>10 Rất tốt</span></div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Bước 3: lưới 6 thẻ Capybara, app.js render từ APP_DATA.EMOTIONS -->
+      <div class="form-section" role="group" aria-labelledby="step3-title">
+        <h2 class="section-title" id="step3-title">
+          <span class="step-num">3</span><span class="section-title-text">Cảm xúc hiện tại của anh/chị giống bé Capybara nào nhất?</span>
+        </h2>
+        <p class="section-hint">Chạm để chọn 1 bé. Cảm xúc không đúng cũng không sai.</p>
+        <div id="capy-grid" class="capy-grid"></div>
+      </div>
+
+      <!-- Minh bạch, hint tiến độ, nút hoàn thành "thức dậy" -->
+      <p class="transparency-line">Dữ liệu dùng để chăm sóc nhân viên, chỉ người phụ trách xem.</p>
+      <div id="progress-hint" class="submit-hint need-id" aria-live="polite">💡 Anh/chị nhập mã số nhân viên ở bước 1 để mình ghi nhận nhé.</div>
+      <button id="btn-submit" class="btn primary pill block btn-submit" type="button" data-act="submit" disabled>Hoàn thành check-in</button>
+
+      <p class="footer-note">Tự đánh giá, không phải thang chẩn đoán.</p>
+    </section>
+
+    <!-- ===== S02: Trang cám ơn ===== -->
+    <section id="thanks" class="card glass" aria-labelledby="thanks-title" hidden>
+      <svg class="success-checkmark" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
+        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+      <h1 id="thanks-title" class="page-title" tabindex="-1">Cám ơn anh/chị</h1>
+      <p class="page-lead">Anh/chị đã dành một phút cho mình trước ca. Chúc anh/chị một ca vững vàng nhé.</p>
+
+      <div class="success-summary">
+        <span class="summary-title">Lượt vừa ghi</span>
+        <div id="summary" class="summary-line"></div>
+      </div>
+
+      <button class="btn secondary pill block" type="button" data-act="again">🩺 Check-in cho ca khác</button>
+
+      <p class="footer-note">Tự đánh giá, không phải thang chẩn đoán.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
